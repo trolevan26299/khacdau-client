@@ -33,5 +33,5 @@ Kết nối repo này trong Cloudflare Pages với cấu hình:
 | Environment variable | `VITE_API_URL=https://khacdauapi.tamtin.id.vn` |
 | Node version | `20` (đã có file `.nvmrc`) |
 
-Backend chỉ cho phép CORS từ `https://khacdau-client.pages.dev` (và các bản preview `*.khacdau-client.pages.dev`).
+Backend chỉ cho phép CORS từ `https://khacdautamtin.pages.dev` (và các bản preview `*.khacdautamtin.pages.dev`).
 Nếu đổi sang domain khác, thêm domain đó vào biến `CORS_ORIGINS` của backend.
