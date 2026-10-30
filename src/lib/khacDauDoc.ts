@@ -2,7 +2,7 @@
 // Bố cục bám theo file mẫu gốc (0319755936.doc): A4, lề trên/dưới/trái 2.54cm, lề phải 1.25cm,
 // Times New Roman, đầu đơn 12pt đậm, tiêu đề 15pt đậm, nội dung 13pt thường,
 // giãn dòng 1.15 + cách sau 8pt (đoạn "Chức vụ" -> "Doanh nghiệp tự chịu..." giãn 1.5).
-// Mẫu 0402362264.doc thêm mục "Thông tin ủy quyền và nhận bàn giao" in đậm, tô vàng.
+// Mẫu 0402362264.doc thêm mục "Thông tin ủy quyền và nhận bàn giao" (chữ thường, không in đậm / tô màu).
 // Mẫu 0401883419.docx: bỏ dòng trống trước tiêu đề, đổi câu "Do mới thành lập..." => "Hiện tại Công Ty...".
 import { zipStore } from './zipStore';
 
@@ -75,20 +75,18 @@ interface ParaOpts {
     bold?: boolean;
     size?: number; // pt
     line?: number;
-    highlight?: boolean;
 }
 
 // Khai báo font ở từng run: Pages/Quick Look bỏ qua font mặc định trong styles.xml
 // và tự thay bằng "Times" (lỗi hiển thị dấu tiếng Việt)
 const FONT = '<w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/>';
 
-const rPr = ({ bold, size = 13, highlight }: ParaOpts) =>
-    `<w:rPr>${FONT}${bold ? '<w:b/><w:bCs/>' : ''}<w:sz w:val="${size * 2}"/><w:szCs w:val="${size * 2}"/>` +
-    `${highlight ? '<w:highlight w:val="yellow"/>' : ''}</w:rPr>`;
+const rPr = ({ bold, size = 13 }: ParaOpts) =>
+    `<w:rPr>${FONT}${bold ? '<w:b/><w:bCs/>' : ''}<w:sz w:val="${size * 2}"/><w:szCs w:val="${size * 2}"/></w:rPr>`;
 
 const authorizationParas = (a?: AuthorizationInfo): string[] => {
     if (!a || a.type === 'none' || !a.name.trim()) return [];
-    const opts = { bold: true, highlight: true, line: LINE_WIDE };
+    const opts = { line: LINE_WIDE };
     const lines = ['Thông tin ủy quyền và nhận bàn giao:'];
     if (a.type === 'individual') {
         lines.push(
