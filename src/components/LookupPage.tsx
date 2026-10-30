@@ -2,6 +2,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import { Account, api } from '../api';
 import {
   AuthorizationInfo,
+  AuthorizationType,
   DEFAULT_ID_ISSUED_BY,
   deriveLocality,
   downloadKhacDauDoc,
@@ -10,6 +11,11 @@ import {
 import { Brand } from './Brand';
 
 const MAX_COMPANIES = 10;
+const AUTH_OPTIONS: { type: AuthorizationType; label: string }[] = [
+  { type: 'agent', label: 'Đại lý' },
+  { type: 'individual', label: 'Cá nhân' },
+  { type: 'none', label: 'Không hiển thị' },
+];
 const TAX_CODE_REGEX = /^\d{10}(-\d{3})?$/;
 const DEFAULT_PLACE = 'TP Hồ Chí Minh';
 const DEFAULT_ISSUED_BY = 'Sở tài chính TP Hồ Chí Minh';
@@ -154,7 +160,7 @@ export function LookupPage({ account, onLogout }: Props) {
   };
 
   const checkAuth = () => {
-    if (!auth.name.trim()) {
+    if (auth.type !== 'none' && !auth.name.trim()) {
       setMessage({ type: 'error', text: 'Vui lòng nhập Thông tin ủy quyền và nhận bàn giao (họ tên hoặc tên đại lý)' });
       document.getElementById('auth-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return false;
@@ -245,42 +251,46 @@ export function LookupPage({ account, onLogout }: Props) {
               <span className="step">2</span> Thông tin ủy quyền và nhận bàn giao
             </h2>
             <div className="segmented">
-              <button className={auth.type === 'agent' ? 'active' : ''} onClick={() => setAuth(a => ({ ...a, type: 'agent' }))}>
-                Đại lý
-              </button>
-              <button
-                className={auth.type === 'individual' ? 'active' : ''}
-                onClick={() => setAuth(a => ({ ...a, type: 'individual' }))}
-              >
-                Cá nhân (CCCD)
-              </button>
+              {AUTH_OPTIONS.map(option => (
+                <button
+                  key={option.type}
+                  className={auth.type === option.type ? 'active' : ''}
+                  onClick={() => setAuth(a => ({ ...a, type: option.type }))}
+                >
+                  {option.label}
+                </button>
+              ))}
             </div>
           </div>
-          <div className="grid">
-            <Field label={auth.type === 'individual' ? 'Họ và tên *' : 'Tên đại lý *'}>
-              <input value={auth.name} onChange={setAuthField('name')} />
-            </Field>
-            {auth.type === 'individual' ? (
-              <>
-                <Field label="Số CCCD">
-                  <input value={auth.idNumber} onChange={setAuthField('idNumber')} inputMode="numeric" />
-                </Field>
-                <Field label="Ngày cấp CCCD">
-                  <input value={auth.idIssueDate} onChange={setAuthField('idIssueDate')} placeholder="VD: 03/10/2025" />
-                </Field>
-                <Field label="Nơi cấp">
-                  <input value={auth.idIssuedBy} onChange={setAuthField('idIssuedBy')} />
-                </Field>
-              </>
-            ) : (
-              <Field label="Địa chỉ đại lý" wide>
-                <input value={auth.address} onChange={setAuthField('address')} />
+          {auth.type === 'none' ? (
+            <p className="muted small">Đơn sẽ không có mục "Thông tin ủy quyền và nhận bàn giao".</p>
+          ) : (
+            <div className="grid">
+              <Field label={auth.type === 'individual' ? 'Họ và tên *' : 'Tên đại lý *'}>
+                <input value={auth.name} onChange={setAuthField('name')} />
               </Field>
-            )}
-            <Field label="Số điện thoại liên hệ">
-              <input value={auth.phone} onChange={setAuthField('phone')} inputMode="tel" />
-            </Field>
-          </div>
+              {auth.type === 'individual' ? (
+                <>
+                  <Field label="Số CCCD">
+                    <input value={auth.idNumber} onChange={setAuthField('idNumber')} inputMode="numeric" />
+                  </Field>
+                  <Field label="Ngày cấp CCCD">
+                    <input value={auth.idIssueDate} onChange={setAuthField('idIssueDate')} placeholder="VD: 03/10/2025" />
+                  </Field>
+                  <Field label="Nơi cấp">
+                    <input value={auth.idIssuedBy} onChange={setAuthField('idIssuedBy')} />
+                  </Field>
+                </>
+              ) : (
+                <Field label="Địa chỉ đại lý" wide>
+                  <input value={auth.address} onChange={setAuthField('address')} />
+                </Field>
+              )}
+              <Field label="Số điện thoại liên hệ">
+                <input value={auth.phone} onChange={setAuthField('phone')} inputMode="tel" />
+              </Field>
+            </div>
+          )}
         </section>
 
         {message && <div className={`alert ${message.type === 'error' ? 'alert-error' : 'alert-success'}`}>{message.text}</div>}

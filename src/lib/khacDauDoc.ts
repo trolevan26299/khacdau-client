@@ -2,7 +2,8 @@
 // Bố cục bám theo file mẫu gốc (0319755936.doc): A4, lề trên/dưới/trái 2.54cm, lề phải 1.25cm,
 // Times New Roman, đầu đơn 12pt đậm, tiêu đề 15pt đậm, nội dung 13pt thường,
 // giãn dòng 1.15 + cách sau 8pt (đoạn "Chức vụ" -> "Doanh nghiệp tự chịu..." giãn 1.5).
-// Mẫu mới (0402362264.doc) thêm mục "Thông tin ủy quyền và nhận bàn giao" in đậm, tô vàng.
+// Mẫu 0402362264.doc thêm mục "Thông tin ủy quyền và nhận bàn giao" in đậm, tô vàng.
+// Mẫu 0401883419.docx: bỏ dòng trống trước tiêu đề, đổi câu "Do mới thành lập..." => "Hiện tại Công Ty...".
 import { zipStore } from './zipStore';
 
 export const OUR_COMPANY_NAME = 'CÔNG TY TNHH THƯƠNG MẠI VÀ KỸ THUẬT TÂM TÍN';
@@ -17,12 +18,14 @@ export interface KhacDauDocData {
     position: string; // Chức vụ
     place: string; // Nơi làm đơn
     docDate: Date; // Ngày làm đơn
-    authorization?: AuthorizationInfo; // Bỏ trống tên => không in mục ủy quyền
+    authorization?: AuthorizationInfo; // type 'none' hoặc bỏ trống tên => không in mục ủy quyền
 }
 
-// Người được ủy quyền và nhận bàn giao dấu: cá nhân (CCCD) hoặc đại lý
+// Người được ủy quyền và nhận bàn giao dấu: cá nhân (CCCD), đại lý, hoặc không in mục này
+export type AuthorizationType = 'individual' | 'agent' | 'none';
+
 export interface AuthorizationInfo {
-    type: 'individual' | 'agent';
+    type: AuthorizationType;
     name: string; // Họ tên / tên đại lý
     idNumber?: string; // Số CCCD
     idIssueDate?: string; // Ngày cấp CCCD
@@ -84,7 +87,7 @@ const rPr = ({ bold, size = 13, highlight }: ParaOpts) =>
     `${highlight ? '<w:highlight w:val="yellow"/>' : ''}</w:rPr>`;
 
 const authorizationParas = (a?: AuthorizationInfo): string[] => {
-    if (!a || !a.name.trim()) return [];
+    if (!a || a.type === 'none' || !a.name.trim()) return [];
     const opts = { bold: true, highlight: true, line: LINE_WIDE };
     const lines = ['Thông tin ủy quyền và nhận bàn giao:'];
     if (a.type === 'individual') {
@@ -128,7 +131,6 @@ const buildDocumentXml = (d: KhacDauDocData) => {
         para('CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM', { ...head, bold: true }),
         para('Độc lập- Tự do- Hạnh phúc', { ...head, bold: true }),
         para(`${spaces(66)}${val(d.place)}, ngày ${day} tháng ${month} năm ${year}`, head),
-        para('', title),
         para('ĐƠN ĐỀ NGHỊ KHẮC DẤU', title),
         para(`Kính gửi: ${OUR_COMPANY_NAME}`),
         para(`Tên doanh nghiệp: ${name}`),
@@ -142,7 +144,7 @@ const buildDocumentXml = (d: KhacDauDocData) => {
             wide
         ),
         para(
-            `Do mới thành lập nên có nhu cầu khắc dấu tròn Doanh nghiệp. Để tạo điều kiện thuận lợi hoạt động ${name} trong thời gian tới, đề nghị quý cơ quan khắc dấu trong thời gian sớm nhất.`,
+            `Hiện tại Công Ty có nhu cầu khắc dấu tròn Doanh nghiệp. Để tạo điều kiện thuận lợi hoạt động ${name} trong thời gian tới, đề nghị quý cơ quan khắc dấu trong thời gian sớm nhất.`,
             wide
         ),
         para('Hồ sơ đính kèm: GPKD bản gốc + CCCD đại diện pháp luật', wide),

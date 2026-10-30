@@ -488,5 +488,7 @@ p {
   }
   .segmented button {
     flex: 1;
+    padding: 7px 4px;
+    font-size: 13px;
   }
 }
