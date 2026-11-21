@@ -281,11 +281,10 @@ export function LookupPage({ account, onLogout }: Props) {
                     <input value={auth.idIssuedBy} onChange={setAuthField('idIssuedBy')} />
                   </Field>
                 </>
-              ) : (
-                <Field label="Địa chỉ đại lý" wide>
-                  <input value={auth.address} onChange={setAuthField('address')} />
-                </Field>
-              )}
+              ) : null}
+              <Field label={auth.type === 'individual' ? 'Địa chỉ (bỏ trống thì không in)' : 'Địa chỉ đại lý'} wide>
+                <input value={auth.address} onChange={setAuthField('address')} />
+              </Field>
               <Field label="Số điện thoại liên hệ">
                 <input value={auth.phone} onChange={setAuthField('phone')} inputMode="tel" />
               </Field>

@@ -30,7 +30,7 @@ export interface AuthorizationInfo {
     idNumber?: string; // Số CCCD
     idIssueDate?: string; // Ngày cấp CCCD
     idIssuedBy?: string; // Nơi cấp CCCD
-    address?: string; // Địa chỉ đại lý
+    address?: string; // Địa chỉ đại lý / cá nhân (bỏ trống thì không in)
     phone?: string;
 }
 
@@ -94,6 +94,7 @@ const authorizationParas = (a?: AuthorizationInfo): string[] => {
                 `Ngày cấp: ${val(a.idIssueDate || '', '....../....../..........')} ` +
                 `Nơi cấp: ${val(a.idIssuedBy || '', DEFAULT_ID_ISSUED_BY)}`
         );
+        if (a.address?.trim()) lines.push(`Địa chỉ: ${a.address.trim()}`);
     } else {
         lines.push(`Đại lý: ${a.name.trim().toUpperCase()}${a.address?.trim() ? `${spaces(3)}Địa chỉ: ${a.address.trim()}` : ''}`);
     }
